@@ -17,8 +17,8 @@ package com.github.pedrovgs;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 

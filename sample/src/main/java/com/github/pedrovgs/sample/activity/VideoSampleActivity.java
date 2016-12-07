@@ -17,7 +17,7 @@ package com.github.pedrovgs.sample.activity;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.app.FragmentActivity;
 import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.VideoView;

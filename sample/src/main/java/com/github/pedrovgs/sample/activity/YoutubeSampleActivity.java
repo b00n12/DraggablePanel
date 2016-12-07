@@ -16,7 +16,7 @@
 package com.github.pedrovgs.sample.activity;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.app.FragmentActivity;
 import android.widget.ImageView;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
