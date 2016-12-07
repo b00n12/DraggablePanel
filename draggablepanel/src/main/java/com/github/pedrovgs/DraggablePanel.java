@@ -369,4 +369,8 @@ public class DraggablePanel extends FrameLayout {
           "You have to set top and bottom fragment before initialize DraggablePanel");
     }
   }
+
+  public DraggableView getDraggableView() {
+    return draggableView;
+  }
 }

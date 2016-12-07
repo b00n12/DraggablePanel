@@ -24,8 +24,10 @@ import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import com.github.pedrovgs.transformer.Transformer;
 import com.github.pedrovgs.transformer.TransformerFactory;
@@ -372,6 +374,7 @@ public class DraggableView extends RelativeLayout {
     }
     boolean isDragViewHit = isViewHit(dragView, (int) ev.getX(), (int) ev.getY());
     boolean isSecondViewHit = isViewHit(secondView, (int) ev.getX(), (int) ev.getY());
+
     analyzeTouchToMaximizeIfNeeded(ev, isDragViewHit);
     if (isMaximized()) {
       dragView.dispatchTouchEvent(ev);
@@ -615,10 +618,21 @@ public class DraggableView extends RelativeLayout {
     this.getLocationOnScreen(parentLocation);
     int screenX = parentLocation[0] + x;
     int screenY = parentLocation[1] + y;
+
+    int height;
+    int width;
+    if (isMinimized()) {
+      height = (int) (view.getHeight() * (1 / scaleFactorY));
+      width = (int) (view.getWidth() * (1 / scaleFactorX));
+    } else {
+      height = view.getHeight();
+      width = view.getWidth();
+    }
+
     return screenX >= viewLocation[0]
-        && screenX < viewLocation[0] + view.getWidth()
+        && screenX < viewLocation[0] + width
         && screenY >= viewLocation[1]
-        && screenY < viewLocation[1] + view.getHeight();
+        && screenY < viewLocation[1] + height;
   }
 
   /**
@@ -784,4 +798,8 @@ public class DraggableView extends RelativeLayout {
   public int getDraggedViewHeightPlusMarginTop() {
     return transformer.getMinHeightPlusMargin();
   }
+
+    public View getSecondView() {
+        return secondView;
+    }
 }
