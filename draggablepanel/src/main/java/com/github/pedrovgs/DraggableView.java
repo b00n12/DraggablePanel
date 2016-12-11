@@ -831,26 +831,30 @@ public class DraggableView extends RelativeLayout
 
     @Override
     public void onShowKeyBoard(int offset) {
-        ViewGroup.LayoutParams layoutParams = getLayoutParams();
 
-        System.out.println("showing: height: " + layoutParams.height + " " +
-            "offset: "
-            + offset);
-        layoutParams.height += offset;
+        if (isMinimized()) {
+            ViewGroup.LayoutParams layoutParams = getLayoutParams();
+            System.out.println("showing: height: " + layoutParams.height + " " +
+                "offset: "
+                + offset);
+            layoutParams.height += offset;
 
-        requestLayout();
+            requestLayout();
+        }
     }
 
     @Override
     public void onHideKeyBoard(int offset) {
 
-        ViewGroup.LayoutParams layoutParams = getLayoutParams();
+        if (isMinimized()) {
+            ViewGroup.LayoutParams layoutParams = getLayoutParams();
 
-        System.out.println("hiding: height: " + layoutParams.height + " " +
-            "offset: "
-            + offset);
-        layoutParams.height -= offset;
+            System.out.println("hiding: height: " + layoutParams.height + " " +
+                "offset: "
+                + offset);
+            layoutParams.height -= offset;
 
-        requestLayout();
+            requestLayout();
+        }
     }
 }
