@@ -84,6 +84,7 @@ public class DraggableView extends RelativeLayout
     private float scaleFactorX, scaleFactorY;
     private int marginBottom, marginRight;
     private int dragViewId, secondViewId;
+    private int keyboardOffset;
 
     public DraggableView(Context context) {
         super(context);
@@ -833,6 +834,7 @@ public class DraggableView extends RelativeLayout
     public void onShowKeyBoard(int offset) {
 
         if (isMinimized()) {
+            keyboardOffset = offset;
             ViewGroup.LayoutParams layoutParams = getLayoutParams();
             System.out.println("showing: height: " + layoutParams.height + " " +
                 "offset: "
@@ -844,15 +846,15 @@ public class DraggableView extends RelativeLayout
     }
 
     @Override
-    public void onHideKeyBoard(int offset) {
+    public void onHideKeyBoard() {
 
         if (isMinimized()) {
             ViewGroup.LayoutParams layoutParams = getLayoutParams();
 
             System.out.println("hiding: height: " + layoutParams.height + " " +
                 "offset: "
-                + offset);
-            layoutParams.height -= offset;
+                + keyboardOffset);
+            layoutParams.height -= keyboardOffset;
 
             requestLayout();
         }

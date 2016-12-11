@@ -8,5 +8,5 @@ public interface OnKeyboardLayoutChangeListener {
 
     void onShowKeyBoard(int offset);
 
-    void onHideKeyBoard(int offset);
+    void onHideKeyBoard();
 }
