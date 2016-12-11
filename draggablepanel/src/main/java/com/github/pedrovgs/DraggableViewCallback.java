@@ -78,7 +78,8 @@ class DraggableViewCallback extends ViewDragHelper.Callback {
   @Override public void onViewReleased(View releasedChild, float xVel, float yVel) {
     super.onViewReleased(releasedChild, xVel, yVel);
 
-    if (draggableView.isDragViewAtBottom() && !draggableView.isDragViewAtRight()) {
+    if (draggableView.isDragViewAtBottom() && !draggableView.isDragViewAtRight()
+          && draggableView.isClosedByHorizontalSlide()) {
       triggerOnReleaseActionsWhileHorizontalDrag(xVel);
     } else {
       triggerOnReleaseActionsWhileVerticalDrag(yVel);

@@ -22,6 +22,9 @@ import android.app.FragmentManager;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Custom view created to handle DraggableView using fragments. With this custom view the client
  * code can configure the
@@ -41,10 +44,11 @@ public class DraggablePanel extends FrameLayout {
   private static final boolean DEFAULT_ENABLE_CLICK_TO_MAXIMIZE = false;
   private static final boolean DEFAULT_ENABLE_CLICK_TO_MINIMIZE = false;
   private static final boolean DEFAULT_ENABLE_TOUCH_LISTENER = true;
+  private static final boolean DEFAULT_ENABLE_CLOSED_BY_HORIZONTAL_SLIDE = true;
   private static final boolean DEFAULT_TOP_FRAGMENT_RESIZE = false;
 
   private DraggableView draggableView;
-  private DraggableListener draggableListener;
+  private List<DraggableListener> draggableListeners;
 
   private FragmentManager fragmentManager;
   private Fragment topFragment;
@@ -58,6 +62,7 @@ public class DraggablePanel extends FrameLayout {
   private boolean enableClickToMaximize;
   private boolean enableClickToMinimize;
   private boolean enableTouchListener;
+  private boolean enableClosedByHorizontalSlide;
 
   public DraggablePanel(Context context) {
     super(context);
@@ -199,8 +204,8 @@ public class DraggablePanel extends FrameLayout {
    * Configure the DraggableListener that is going to be invoked when the view be minimized,
    * maximized, closed to the left or right.
    */
-  public void setDraggableListener(DraggableListener draggableListener) {
-    this.draggableListener = draggableListener;
+  public void addDraggableListener(DraggableListener draggableListener) {
+    this.draggableListeners.add(draggableListener);
   }
 
   /**
@@ -261,7 +266,9 @@ public class DraggablePanel extends FrameLayout {
     checkSupportFragmentManagerConsistency();
 
     inflate(getContext(), R.layout.draggable_panel, this);
-    draggableView = (DraggableView) findViewById(R.id.draggable_view);
+    if (draggableView == null) {
+      draggableView = (DraggableView) findViewById(R.id.draggable_view);
+    }
     draggableView.setTopViewHeight(topFragmentHeight);
     draggableView.setFragmentManager(fragmentManager);
     draggableView.attachTopFragment(topFragment);
@@ -270,11 +277,12 @@ public class DraggablePanel extends FrameLayout {
     draggableView.setTopViewMarginRight(topFragmentMarginRight);
     draggableView.setTopViewMarginBottom(topFragmentMarginBottom);
     draggableView.attachBottomFragment(bottomFragment);
-    draggableView.setDraggableListener(draggableListener);
+    draggableView.addDraggableListeners(draggableListeners);
     draggableView.setHorizontalAlphaEffectEnabled(enableHorizontalAlphaEffect);
     draggableView.setClickToMaximizeEnabled(enableClickToMaximize);
     draggableView.setClickToMinimizeEnabled(enableClickToMinimize);
     draggableView.setTouchEnabled(enableTouchListener);
+    draggableView.setClosedByHorizontalSlide(enableClosedByHorizontalSlide);
   }
 
   /**
@@ -319,6 +327,8 @@ public class DraggablePanel extends FrameLayout {
    * @param attrs to analyze.
    */
   private void initializeAttrs(AttributeSet attrs) {
+    draggableListeners = new LinkedList<>();
+
     TypedArray attributes = getContext().obtainStyledAttributes(attrs, R.styleable.draggable_panel);
     this.topFragmentHeight =
         attributes.getDimensionPixelSize(R.styleable.draggable_panel_top_fragment_height,
@@ -372,5 +382,13 @@ public class DraggablePanel extends FrameLayout {
 
   public DraggableView getDraggableView() {
     return draggableView;
+  }
+
+  public boolean isEnableClosedByHorizontalSlide() {
+    return enableClosedByHorizontalSlide;
+  }
+
+  public void setEnableClosedByHorizontalSlide(boolean enableClosedByHorizontalSlide) {
+    this.enableClosedByHorizontalSlide = enableClosedByHorizontalSlide;
   }
 }
