@@ -3,6 +3,7 @@ apply plugin: 'checkstyle'
 
 
 dependencies {
+    compile 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.0.0'
     compile 'com.android.support:support-v4:25.0.1'
     compile 'com.nineoldandroids:library:2.4.0'
 }

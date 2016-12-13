@@ -15,8 +15,10 @@
  */
 package com.github.pedrovgs;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -27,12 +29,17 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.RelativeLayout;
 
 import com.github.pedrovgs.transformer.Transformer;
 import com.github.pedrovgs.transformer.TransformerFactory;
 import com.nineoldandroids.view.ViewHelper;
+
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +50,7 @@ import java.util.List;
  * @author Pedro Vicente Gómez Sánchez
  */
 public class DraggableView extends RelativeLayout
-    implements OnKeyboardLayoutChangeListener {
+    implements KeyboardVisibilityEventListener {
 
     private static final int DEFAULT_SCALE_FACTOR = 2;
     private static final int DEFAULT_TOP_VIEW_MARGIN = 30;
@@ -51,6 +58,7 @@ public class DraggableView extends RelativeLayout
     private static final float SLIDE_TOP = 0f;
     private static final float SLIDE_BOTTOM = 1f;
     private static final float MIN_SLIDE_OFFSET = 0.1f;
+    private static final int KEYBOARD_DRAGVIEW_TRANSLATION_DURATION = 400;
     private static final boolean DEFAULT_ENABLE_HORIZONTAL_ALPHA_EFFECT = true;
     private static final boolean DEFAULT_ENABLE_CLICK_TO_MAXIMIZE = false;
     private static final boolean DEFAULT_ENABLE_CLICK_TO_MINIMIZE = false;
@@ -67,6 +75,7 @@ public class DraggableView extends RelativeLayout
 
     private View dragView;
     private View secondView;
+    private Activity activity;
 
     private FragmentManager fragmentManager;
     private ViewDragHelper viewDragHelper;
@@ -204,6 +213,7 @@ public class DraggableView extends RelativeLayout
      */
     public void setTopViewMarginBottom(int topFragmentMarginBottom) {
         transformer.setMarginBottom(topFragmentMarginBottom);
+        this.marginBottom = topFragmentMarginBottom;
     }
 
     /**
@@ -831,32 +841,44 @@ public class DraggableView extends RelativeLayout
     }
 
     @Override
-    public void onShowKeyBoard(int offset) {
+    public void onVisibilityChanged(boolean isOpen) {
 
-        if (isMinimized()) {
-            keyboardOffset = offset;
-            ViewGroup.LayoutParams layoutParams = getLayoutParams();
-            System.out.println("showing: height: " + layoutParams.height + " " +
-                "offset: "
-                + offset);
-            layoutParams.height += offset;
-
-            requestLayout();
+        if (activity == null) {
+            throw new RuntimeException("Activity not set, cannot move " +
+                "dragview if keyboard is shown.");
         }
+
+        if (isOpen) {
+            Rect r = new Rect();
+            View rootview = activity.getWindow().getDecorView(); // this = activity
+            rootview.getWindowVisibleDisplayFrame(r);
+            this.keyboardOffset = r.bottom;
+            moveDragViewUp(keyboardOffset);
+        } else {
+            moveDragViewDown(this.keyboardOffset);
+        }
+
     }
 
-    @Override
-    public void onHideKeyBoard() {
+    private void moveDragViewUp(final int keyboardOffset) {
 
-        if (isMinimized()) {
-            ViewGroup.LayoutParams layoutParams = getLayoutParams();
+        final int endPosition = (int) (dragView.getHeight() * (1 / scaleFactorY)
+                    + keyboardOffset + marginBottom);
+        int delta = (int) (endPosition - dragView.getY());
 
-            System.out.println("hiding: height: " + layoutParams.height + " " +
-                "offset: "
-                + keyboardOffset);
-            layoutParams.height -= keyboardOffset;
+        dragView.animate().y(dragView.getY() - delta);
+        this.keyboardOffset = delta;
+    }
 
-            requestLayout();
-        }
+    private void moveDragViewDown(int keyboardOffset) {
+        dragView.animate().y(dragView.getY() + keyboardOffset);
+    }
+
+    public Activity getActivity() {
+        return activity;
+    }
+
+    public void setActivity(Activity activity) {
+        this.activity = activity;
     }
 }
